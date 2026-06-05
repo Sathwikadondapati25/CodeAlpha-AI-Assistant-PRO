@@ -1,0 +1,4 @@
+*.class
+*.log
+data/chat_history.txt
+data/admin.properties
