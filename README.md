@@ -123,7 +123,7 @@ data/
 ### Clone & run
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/CodeAlpha_AI_Assistant_PRO.git
+git clone https://github.comSathwikadondapati25CodeAlpha-AI-Assistant-PRO.git
 cd CodeAlpha_AI_Assistant_PRO
 javac *.java
 java Main
