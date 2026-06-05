@@ -1,0 +1,24 @@
+SESSION|session-033ff98c|hey|false|2026-06-04 16:29:32|2026-06-05 20:35:30|true
+SESSION|session-81e47614|hey iee|false|2026-06-04 12:16:52|2026-06-05 20:23:20|false
+SESSION|session-f0ae9bba|coding|false|2026-06-04 12:16:52|2026-06-04 12:16:52|false
+2026-06-04 16:29:32|session-033ff98c|bot|Nova AI|New chat started. Ask me anything about coding, AI, career, or studies.
+2026-06-04 16:51:31|session-033ff98c|user|sath|hey
+2026-06-04 16:51:32|session-033ff98c|bot|Nova AI|Hey! Great to see you. What would you like to talk about?
+2026-06-05 20:35:29|session-033ff98c|user|sath|AI
+2026-06-05 20:35:30|session-033ff98c|bot|Nova AI|Artificial Intelligence helps machines perform tasks that usually need human intelligence, like language understanding, vision, prediction, and decision support.
+2026-06-02 18:04:08|session-81e47614|bot|Nova AI|Welcome to Nova AI Assistant PRO. How can I help you today?
+2026-06-02 18:04:24|session-81e47614|user|Guest|hey iee
+2026-06-02 18:04:24|session-81e47614|bot|Nova AI|Hello! I am Nova AI Assistant PRO. How can I support you today?
+2026-06-02 18:04:42|session-81e47614|user|Guest|i want to learn something new
+2026-06-02 18:04:43|session-81e47614|bot|Nova AI|Hello! I am Nova AI Assistant PRO. How can I support you today?
+2026-06-02 18:04:49|session-81e47614|user|Guest|java
+2026-06-02 18:04:50|session-81e47614|bot|Nova AI|Java is a powerful object-oriented language used for enterprise systems, Android apps, desktop software, and backend services. It runs on the JVM, so code is portable across platforms.
+2026-06-02 18:11:45|session-81e47614|user|Guest|python
+2026-06-02 18:11:45|session-81e47614|bot|Nova AI|That's great! Python is a beginner-friendly programming language. Are you learning it for AI, web development, or automation?
+2026-06-04 12:17:19|session-81e47614|user|sath|hey
+2026-06-04 12:17:20|session-81e47614|bot|Nova AI|Hi there! Ready to learn and build something amazing?
+2026-06-02 18:11:55|session-f0ae9bba|bot|Nova AI|New chat started. Ask me anything about coding, AI, career, or studies.
+2026-06-02 18:12:04|session-f0ae9bba|user|Guest|coding
+2026-06-02 18:12:05|session-f0ae9bba|bot|Nova AI|I understand your question. Could you share a little more context so I can give you a more precise answer?
+2026-06-02 18:12:13|session-f0ae9bba|user|Guest|html
+2026-06-02 18:12:14|session-f0ae9bba|bot|Nova AI|Machine Learning is a branch of AI where models learn patterns from data to make predictions or decisions without explicit rule-by-rule programming.
