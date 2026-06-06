@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 public class FileStore {
     private final Path chatHistoryPath;
     private final Path profilePath;
-    private static final Path ADMIN_PATH = Paths.get("data", "admin.properties");
+    private static final Path USERS_PATH = Paths.get("data", "users.properties");
+    private static final Path CONFIG_PATH = Paths.get("data", "config.properties");
 
     public FileStore(String chatHistoryPath, String profilePath) {
         this.chatHistoryPath = Paths.get(chatHistoryPath);
@@ -267,86 +268,70 @@ public class FileStore {
         }
     }
 
-    // ===== Admin login storage (data/admin.properties) =====
+    // ===== Multi-User login storage (data/users.properties) =====
 
-    public static class AdminCredentials {
-        public final String username;
-        public final String password;
-
-        public AdminCredentials(String username, String password) {
-            this.username = username;
-            this.password = password;
+    public static synchronized Properties loadUsers() {
+        ensureFileExists(USERS_PATH);
+        Properties props = new Properties();
+        try {
+            props.load(Files.newBufferedReader(USERS_PATH, StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return props;
     }
 
-    public static synchronized void saveAdminCredentials(String username, String password) {
-        ensureAdminFileExists();
-        Properties props = new Properties();
-        props.setProperty("admin.username", username);
-        props.setProperty("admin.password", password);
-        try (BufferedWriter writer = Files.newBufferedWriter(ADMIN_PATH, StandardCharsets.UTF_8,
+    public static synchronized void saveUser(String username, String password) {
+        ensureFileExists(USERS_PATH);
+        Properties props = loadUsers();
+        props.setProperty(username.toLowerCase(), password);
+        try (BufferedWriter writer = Files.newBufferedWriter(USERS_PATH, StandardCharsets.UTF_8,
                 StandardOpenOption.TRUNCATE_EXISTING)) {
-            props.store(writer, "Nova AI Assistant PRO admin credentials");
+            props.store(writer, "Nova AI Assistant PRO registered users");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static synchronized AdminCredentials loadAdminCredentials() {
-        ensureAdminFileExists();
-        Properties props = new Properties();
-        try {
-            props.load(Files.newBufferedReader(ADMIN_PATH, StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            return null;
-        }
-        String user = props.getProperty("admin.username", "").trim();
-        String pass = props.getProperty("admin.password", "");
-        if (user.isEmpty() || pass.isEmpty()) {
-            return null;
-        }
-        return new AdminCredentials(user, pass);
-    }
-
     public static synchronized void saveRememberedUsername(String username) {
-        ensureAdminFileExists();
+        ensureFileExists(CONFIG_PATH);
         Properties props = new Properties();
         try {
-            props.load(Files.newBufferedReader(ADMIN_PATH, StandardCharsets.UTF_8));
+            props.load(Files.newBufferedReader(CONFIG_PATH, StandardCharsets.UTF_8));
         } catch (IOException ignored) {
         }
-        props.setProperty("remember.username", username);
-        try (BufferedWriter writer = Files.newBufferedWriter(ADMIN_PATH, StandardCharsets.UTF_8,
+        props.setProperty("remember.username", username.toLowerCase());
+        try (BufferedWriter writer = Files.newBufferedWriter(CONFIG_PATH, StandardCharsets.UTF_8,
                 StandardOpenOption.TRUNCATE_EXISTING)) {
-            props.store(writer, "Nova AI Assistant PRO admin credentials");
+            props.store(writer, "Nova AI Assistant PRO configuration");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static synchronized String loadRememberedUsername() {
-        ensureAdminFileExists();
+        ensureFileExists(CONFIG_PATH);
         Properties props = new Properties();
         try {
-            props.load(Files.newBufferedReader(ADMIN_PATH, StandardCharsets.UTF_8));
+            props.load(Files.newBufferedReader(CONFIG_PATH, StandardCharsets.UTF_8));
         } catch (IOException e) {
             return null;
         }
-        String user = props.getProperty("remember.username", "").trim();
+        String user = props.getProperty("remember.username", "").trim().toLowerCase();
         return user.isEmpty() ? null : user;
     }
 
     public static synchronized void clearRememberedUsername() {
-        ensureAdminFileExists();
+        ensureFileExists(CONFIG_PATH);
         Properties props = new Properties();
         try {
-            props.load(Files.newBufferedReader(ADMIN_PATH, StandardCharsets.UTF_8));
+            props.load(Files.newBufferedReader(CONFIG_PATH, StandardCharsets.UTF_8));
         } catch (IOException ignored) {
         }
         props.remove("remember.username");
-        try (BufferedWriter writer = Files.newBufferedWriter(ADMIN_PATH, StandardCharsets.UTF_8,
+        try (BufferedWriter writer = Files.newBufferedWriter(CONFIG_PATH, StandardCharsets.UTF_8,
                 StandardOpenOption.TRUNCATE_EXISTING)) {
-            props.store(writer, "Nova AI Assistant PRO admin credentials");
+            props.store(writer, "Nova AI Assistant PRO configuration");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -383,14 +368,14 @@ public class FileStore {
         return builder.toString();
     }
 
-    private static void ensureAdminFileExists() {
+    private static void ensureFileExists(Path path) {
         try {
-            Path parent = ADMIN_PATH.getParent();
+            Path parent = path.getParent();
             if (parent != null && !Files.exists(parent)) {
                 Files.createDirectories(parent);
             }
-            if (!Files.exists(ADMIN_PATH)) {
-                Files.createFile(ADMIN_PATH);
+            if (!Files.exists(path)) {
+                Files.createFile(path);
             }
         } catch (IOException e) {
             e.printStackTrace();

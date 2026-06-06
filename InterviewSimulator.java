@@ -43,7 +43,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 public class InterviewSimulator extends JDialog {
-    private static final Path HISTORY_PATH = Paths.get("data", "interview_history.txt");
+    private final Path historyPath;
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final int POINTS_PER_QUESTION = 10;
 
@@ -69,6 +69,7 @@ public class InterviewSimulator extends JDialog {
 
     public InterviewSimulator(JFrame owner) {
         super(owner, "Interview Simulator", true);
+        this.historyPath = getHistoryPath(owner);
         setMinimumSize(new Dimension(920, 620));
         setSize(960, 660);
         setLocationRelativeTo(owner);
@@ -89,6 +90,14 @@ public class InterviewSimulator extends JDialog {
 
         cardLayout.show(cardPanel, "mode");
         refreshHistoryList();
+    }
+
+    private static Path getHistoryPath(JFrame owner) {
+        if (owner instanceof NovaAIFrame) {
+            String username = ((NovaAIFrame) owner).getCurrentUser();
+            return Paths.get("data", username, "interview_history.txt");
+        }
+        return Paths.get("data", "interview_history.txt");
     }
 
     public static void showSimulator(JFrame owner) {
@@ -372,7 +381,7 @@ public class InterviewSimulator extends JDialog {
             appendStyled(doc, "Tip: " + record.getTip() + "\n\n", normal);
             qNum++;
         }
-        appendStyled(doc, "Session saved to data/interview_history.txt\n", normal);
+        appendStyled(doc, "Session saved to " + historyPath.toString().replace('\\', '/') + "\n", normal);
         summaryPane.setCaretPosition(0);
     }
 
@@ -410,17 +419,17 @@ public class InterviewSimulator extends JDialog {
         return Math.min(POINTS_PER_QUESTION, keywordScore + lengthScore + clarityBonus);
     }
 
-    private static void saveResult(InterviewResult result) {
+    private void saveResult(InterviewResult result) {
         try {
-            Path parent = HISTORY_PATH.getParent();
+            Path parent = historyPath.getParent();
             if (parent != null && !Files.exists(parent)) {
                 Files.createDirectories(parent);
             }
-            if (!Files.exists(HISTORY_PATH)) {
-                Files.createFile(HISTORY_PATH);
+            if (!Files.exists(historyPath)) {
+                Files.createFile(historyPath);
             }
             try (BufferedWriter writer = Files.newBufferedWriter(
-                    HISTORY_PATH,
+                    historyPath,
                     StandardCharsets.UTF_8,
                     StandardOpenOption.APPEND)) {
                 writer.write(result.toStorageHeader());
@@ -435,13 +444,13 @@ public class InterviewSimulator extends JDialog {
         }
     }
 
-    private static List<InterviewResult> loadHistory() {
-        if (!Files.exists(HISTORY_PATH)) {
+    private List<InterviewResult> loadHistory() {
+        if (!Files.exists(historyPath)) {
             return Collections.emptyList();
         }
         Map<String, InterviewResult> byId = new LinkedHashMap<>();
         try {
-            for (String line : Files.readAllLines(HISTORY_PATH, StandardCharsets.UTF_8)) {
+            for (String line : Files.readAllLines(historyPath, StandardCharsets.UTF_8)) {
                 if (line.startsWith("INTERVIEW|")) {
                     InterviewResult result = InterviewResult.fromHeader(line);
                     if (result != null) {

@@ -34,7 +34,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class NotesManager extends JDialog {
-    private static final Path NOTES_PATH = Paths.get("data", "notes.txt");
+    private final Path notesPath;
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final List<Note> notes = new ArrayList<>();
@@ -50,6 +50,7 @@ public class NotesManager extends JDialog {
 
     public NotesManager(JFrame owner) {
         super(owner, "Notes Manager", true);
+        this.notesPath = getNotesPath(owner);
         setMinimumSize(new Dimension(900, 580));
         setSize(940, 620);
         setLocationRelativeTo(owner);
@@ -67,13 +68,21 @@ public class NotesManager extends JDialog {
         refreshList();
     }
 
+    private static Path getNotesPath(JFrame owner) {
+        if (owner instanceof NovaAIFrame) {
+            String username = ((NovaAIFrame) owner).getCurrentUser();
+            return Paths.get("data", username, "notes.txt");
+        }
+        return Paths.get("data", "notes.txt");
+    }
+
     public static void showManager(JFrame owner) {
         NotesManager dialog = new NotesManager(owner);
         dialog.setVisible(true);
     }
 
     public static void exportNotes(JFrame owner) {
-        List<Note> all = loadAllNotes();
+        List<Note> all = loadAllNotes(owner);
         if (all.isEmpty()) {
             JOptionPane.showMessageDialog(owner, "No notes to export.", "Export Notes",
                     JOptionPane.INFORMATION_MESSAGE);
@@ -115,13 +124,14 @@ public class NotesManager extends JDialog {
         }
     }
 
-    private static List<Note> loadAllNotes() {
+    private static List<Note> loadAllNotes(JFrame owner) {
         List<Note> loaded = new ArrayList<>();
-        if (!Files.exists(NOTES_PATH)) {
+        Path path = getNotesPath(owner);
+        if (!Files.exists(path)) {
             return loaded;
         }
         try {
-            for (String line : Files.readAllLines(NOTES_PATH, StandardCharsets.UTF_8)) {
+            for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
                 Note note = Note.fromStorageLine(line);
                 if (note != null) {
                     loaded.add(note);
@@ -247,11 +257,11 @@ public class NotesManager extends JDialog {
 
     private void loadNotes() {
         notes.clear();
-        if (!Files.exists(NOTES_PATH)) {
+        if (!Files.exists(notesPath)) {
             return;
         }
         try {
-            for (String line : Files.readAllLines(NOTES_PATH, StandardCharsets.UTF_8)) {
+            for (String line : Files.readAllLines(notesPath, StandardCharsets.UTF_8)) {
                 Note note = Note.fromStorageLine(line);
                 if (note != null) {
                     notes.add(note);
@@ -264,12 +274,12 @@ public class NotesManager extends JDialog {
 
     private void persistNotes() {
         try {
-            Path parent = NOTES_PATH.getParent();
+            Path parent = notesPath.getParent();
             if (parent != null && !Files.exists(parent)) {
                 Files.createDirectories(parent);
             }
             try (BufferedWriter writer = Files.newBufferedWriter(
-                    NOTES_PATH, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                    notesPath, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
                 for (Note note : notes) {
                     writer.write(note.toStorageLine());
                     writer.newLine();

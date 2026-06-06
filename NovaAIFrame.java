@@ -52,18 +52,38 @@ public class NovaAIFrame extends JFrame {
         return profile != null ? profile.getName() : "";
     }
 
-    public NovaAIFrame() {
-        fileStore = new FileStore("data/chat_history.txt", "data/user_profile.properties");
-        aiEngine = new AIEngine();
-        sessionMessages = new LinkedHashMap<>();
-        chatSessions = new LinkedHashMap<>();
-        profile = fileStore.loadUserProfile();
+    private final String currentUser;
 
-        loadSessions();
-        initializeUI();
-        applyTheme(profile.getTheme());
-        ensureWelcomeMessage();
-    }
+public NovaAIFrame(String username) {
+    String lowerUsername = username != null ? username.toLowerCase() : "";
+    this.currentUser = lowerUsername;
+
+    String userFolder = "data/" + lowerUsername;
+
+    new File(userFolder).mkdirs();
+
+    fileStore = new FileStore(
+            userFolder + "/chat_history.txt",
+            userFolder + "/profile.properties"
+    );
+
+    aiEngine = new AIEngine();
+    sessionMessages = new LinkedHashMap<>();
+    chatSessions = new LinkedHashMap<>();
+    profile = fileStore.loadUserProfile();
+
+    
+    initializeUI();
+    loadSessions();
+    applyTheme(profile.getTheme());
+    ensureWelcomeMessage();
+}
+
+public String getCurrentUser() {
+    return currentUser;
+}
+
+
 
     public ThemeManager.AppTheme getCurrentTheme() {
         return profile.getTheme();

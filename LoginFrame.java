@@ -151,11 +151,11 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(4, 0, 4, 0);
         card.add(loginButton, gbc);
 
-        JButton createAdminButton = buildSecondaryButton("Create Admin Account");
-        createAdminButton.addActionListener(e -> handleCreateAdmin());
+        JButton createAccountButton = buildSecondaryButton("Create New Account");
+        createAccountButton.addActionListener(e -> handleCreateAccount());
         gbc.gridy = 8;
         gbc.insets = new Insets(2, 0, 0, 0);
-        card.add(createAdminButton, gbc);
+        card.add(createAccountButton, gbc);
 
         outer.add(card);
 
@@ -246,7 +246,7 @@ public class LoginFrame extends JFrame {
     }
 
     private void handleLogin(ActionEvent e) {
-        String username = usernameField.getText().trim();
+        String username = usernameField.getText().trim().toLowerCase();
         String password = new String(passwordField.getPassword());
 
         if (username.isEmpty() || password.isEmpty()) {
@@ -255,16 +255,17 @@ public class LoginFrame extends JFrame {
             return;
         }
 
-        FileStore.AdminCredentials creds = FileStore.loadAdminCredentials();
-        if (creds == null) {
+        java.util.Properties users = FileStore.loadUsers();
+        if (users.isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                    "No admin account found. Please create an admin account first.",
-                    "Admin Not Configured",
+                    "No registered accounts found. Please create an account first.",
+                    "Account Not Configured",
                     JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        if (!username.equals(creds.username) || !password.equals(creds.password)) {
+        String savedPassword = users.getProperty(username);
+        if (savedPassword == null || !savedPassword.equals(password)) {
             JOptionPane.showMessageDialog(this,
                     "Invalid username or password.",
                     "Login Failed",
@@ -283,21 +284,23 @@ public class LoginFrame extends JFrame {
     }
 
     private void openMainApplication(String username) {
-        String displayName = username == null || username.isEmpty() ? "Guest" : username;
-        FileStore fileStore = new FileStore("data/chat_history.txt", "data/user_profile.properties");
+        String lowerUsername = username == null ? "" : username.trim().toLowerCase();
+        String displayName = lowerUsername.isEmpty() ? "guest" : lowerUsername;
+        String userFolder = "data/" + displayName;
+        new java.io.File(userFolder).mkdirs();
+        FileStore fileStore = new FileStore(userFolder + "/chat_history.txt", userFolder + "/profile.properties");
         UserProfile profile = fileStore.loadUserProfile();
-        if ("Guest".equalsIgnoreCase(profile.getName()) || profile.getName().isEmpty()) {
+        if ("Guest".equalsIgnoreCase(profile.getName()) || profile.getName().isEmpty() || "guest".equals(profile.getName())) {
             fileStore.saveUserProfile(new UserProfile(displayName, profile.getEmail(), profile.getTheme()));
         }
-
         SwingUtilities.invokeLater(() -> {
-            NovaAIFrame mainFrame = new NovaAIFrame();
+            NovaAIFrame mainFrame = new NovaAIFrame(lowerUsername);
             mainFrame.setVisible(true);
             dispose();
         });
     }
 
-    private void handleCreateAdmin() {
+    private void handleCreateAccount() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(CARD);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -311,31 +314,31 @@ public class LoginFrame extends JFrame {
         JPasswordField passField = new JPasswordField();
 
         gbc.gridy = 0;
-        panel.add(new JLabel("Admin Username"), gbc);
+        panel.add(new JLabel("Username"), gbc);
         gbc.gridy = 1;
         panel.add(userField, gbc);
         gbc.gridy = 2;
-        panel.add(new JLabel("Admin Password"), gbc);
+        panel.add(new JLabel("Password"), gbc);
         gbc.gridy = 3;
         panel.add(passField, gbc);
 
         int result = JOptionPane.showConfirmDialog(
                 this,
                 panel,
-                "Create / Update Admin Account",
+                "Create / Update Account",
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
-            String user = userField.getText().trim();
+            String user = userField.getText().trim().toLowerCase();
             String pass = new String(passField.getPassword());
             if (user.isEmpty() || pass.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Username and password cannot be empty.", "Invalid Input",
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            FileStore.saveAdminCredentials(user, pass);
-            JOptionPane.showMessageDialog(this, "Admin account saved successfully.");
+            FileStore.saveUser(user, pass);
+            JOptionPane.showMessageDialog(this, "Account saved successfully.");
         }
     }
 

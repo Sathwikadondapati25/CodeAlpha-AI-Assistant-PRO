@@ -23,23 +23,63 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 public class StatisticsManager {
-    private static final Path CHAT_PATH = Paths.get("data", "chat_history.txt");
-    private static final Path NOTES_PATH = Paths.get("data", "notes.txt");
-    private static final Path TASKS_PATH = Paths.get("data", "study_tasks.txt");
-    private static final Path INTERVIEW_PATH = Paths.get("data", "interview_history.txt");
-    private static final Path PROFILE_PATH = Paths.get("data", "user_profile.properties");
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private StatisticsManager() {
     }
 
-    public static AppStatistics collect() {
-        AppStatistics stats = new AppStatistics();
-        stats.setProfileName(loadProfileName());
+    private static Path getChatPath(JFrame owner) {
+        if (owner instanceof NovaAIFrame) {
+            String username = ((NovaAIFrame) owner).getCurrentUser();
+            return Paths.get("data", username, "chat_history.txt");
+        }
+        return Paths.get("data", "chat_history.txt");
+    }
 
-        if (Files.exists(CHAT_PATH)) {
+    private static Path getNotesPath(JFrame owner) {
+        if (owner instanceof NovaAIFrame) {
+            String username = ((NovaAIFrame) owner).getCurrentUser();
+            return Paths.get("data", username, "notes.txt");
+        }
+        return Paths.get("data", "notes.txt");
+    }
+
+    private static Path getTasksPath(JFrame owner) {
+        if (owner instanceof NovaAIFrame) {
+            String username = ((NovaAIFrame) owner).getCurrentUser();
+            return Paths.get("data", username, "study_tasks.txt");
+        }
+        return Paths.get("data", "study_tasks.txt");
+    }
+
+    private static Path getInterviewPath(JFrame owner) {
+        if (owner instanceof NovaAIFrame) {
+            String username = ((NovaAIFrame) owner).getCurrentUser();
+            return Paths.get("data", username, "interview_history.txt");
+        }
+        return Paths.get("data", "interview_history.txt");
+    }
+
+    private static Path getProfilePath(JFrame owner) {
+        if (owner instanceof NovaAIFrame) {
+            String username = ((NovaAIFrame) owner).getCurrentUser();
+            return Paths.get("data", username, "profile.properties");
+        }
+        return Paths.get("data", "user_profile.properties");
+    }
+
+    public static AppStatistics collect(JFrame owner) {
+        AppStatistics stats = new AppStatistics();
+        stats.setProfileName(loadProfileName(owner));
+
+        Path chatPath = getChatPath(owner);
+        Path notesPath = getNotesPath(owner);
+        Path tasksPath = getTasksPath(owner);
+        Path interviewPath = getInterviewPath(owner);
+
+        if (Files.exists(chatPath)) {
             try {
-                List<String> lines = Files.readAllLines(CHAT_PATH, StandardCharsets.UTF_8);
+                List<String> lines = Files.readAllLines(chatPath, StandardCharsets.UTF_8);
                 for (String line : lines) {
                     if (line.startsWith("SESSION|")) {
                         stats.incrementChatSessions();
@@ -57,9 +97,9 @@ public class StatisticsManager {
             }
         }
 
-        if (Files.exists(NOTES_PATH)) {
+        if (Files.exists(notesPath)) {
             try {
-                for (String line : Files.readAllLines(NOTES_PATH, StandardCharsets.UTF_8)) {
+                for (String line : Files.readAllLines(notesPath, StandardCharsets.UTF_8)) {
                     if (line.startsWith("NOTE|")) {
                         stats.incrementNotes();
                     }
@@ -68,9 +108,9 @@ public class StatisticsManager {
             }
         }
 
-        if (Files.exists(TASKS_PATH)) {
+        if (Files.exists(tasksPath)) {
             try {
-                for (String line : Files.readAllLines(TASKS_PATH, StandardCharsets.UTF_8)) {
+                for (String line : Files.readAllLines(tasksPath, StandardCharsets.UTF_8)) {
                     if (line.startsWith("GOAL|")) {
                         stats.incrementStudyGoals();
                         String[] parts = line.split("\\|", 7);
@@ -85,9 +125,9 @@ public class StatisticsManager {
             }
         }
 
-        if (Files.exists(INTERVIEW_PATH)) {
+        if (Files.exists(interviewPath)) {
             try {
-                for (String line : Files.readAllLines(INTERVIEW_PATH, StandardCharsets.UTF_8)) {
+                for (String line : Files.readAllLines(interviewPath, StandardCharsets.UTF_8)) {
                     if (line.startsWith("INTERVIEW|")) {
                         stats.incrementInterviews();
                         String[] parts = line.split("\\|");
@@ -109,7 +149,7 @@ public class StatisticsManager {
     }
 
     public static void showDashboard(JFrame owner, ThemeManager.AppTheme theme) {
-        AppStatistics stats = collect();
+        AppStatistics stats = collect(owner);
         JDialog dialog = new JDialog(owner, "Statistics Dashboard", true);
         dialog.setSize(720, 520);
         dialog.setMinimumSize(new Dimension(640, 460));
@@ -136,7 +176,7 @@ public class StatisticsManager {
         cards.add(statCard("Avg Interview", stats.getAverageInterviewPercent() + "%", theme));
         cards.add(statCard("Profile", stats.getProfileName(), theme));
 
-        JTextArea details = new JTextArea(stats.toDetailedReport());
+        JTextArea details = new JTextArea(stats.toDetailedReport(owner));
         details.setEditable(false);
         details.setFont(new Font("Consolas", Font.PLAIN, 12));
         ThemeManager.styleTextArea(details, theme);
@@ -152,7 +192,7 @@ public class StatisticsManager {
         JButton closeButton = new JButton("Close");
         ThemeManager.styleButton(refreshButton, theme);
         ThemeManager.styleButton(closeButton, theme);
-        refreshButton.addActionListener(e -> details.setText(collect().toDetailedReport()));
+        refreshButton.addActionListener(e -> details.setText(collect(owner).toDetailedReport(owner)));
         closeButton.addActionListener(e -> dialog.dispose());
 
         JPanel footer = new JPanel(new BorderLayout());
@@ -195,13 +235,14 @@ public class StatisticsManager {
         return card;
     }
 
-    private static String loadProfileName() {
-        if (!Files.exists(PROFILE_PATH)) {
+    private static String loadProfileName(JFrame owner) {
+        Path profilePath = getProfilePath(owner);
+        if (!Files.exists(profilePath)) {
             return "Guest";
         }
         Properties props = new Properties();
         try {
-            props.load(Files.newBufferedReader(PROFILE_PATH, StandardCharsets.UTF_8));
+            props.load(Files.newBufferedReader(profilePath, StandardCharsets.UTF_8));
             return props.getProperty("name", "Guest");
         } catch (IOException e) {
             return "Guest";
@@ -314,7 +355,7 @@ public class StatisticsManager {
             return String.format("%.0f", (interviewScoreSum * 100.0) / interviewMaxSum);
         }
 
-        public String toDetailedReport() {
+        public String toDetailedReport(JFrame owner) {
             StringBuilder report = new StringBuilder();
             report.append("NOVA AI ASSISTANT PRO — STATISTICS REPORT\n");
             report.append("Generated: ").append(LocalDateTime.now().format(TIME_FORMAT)).append("\n");
@@ -345,11 +386,11 @@ public class StatisticsManager {
             report.append("  Average score: ").append(getAverageInterviewPercent()).append("%\n\n");
 
             report.append("[ STORAGE FILES ]\n");
-            report.append("  data/chat_history.txt\n");
-            report.append("  data/notes.txt\n");
-            report.append("  data/study_tasks.txt\n");
-            report.append("  data/interview_history.txt\n");
-            report.append("  data/user_profile.properties\n");
+            report.append("  ").append(getChatPath(owner).toString().replace('\\', '/')).append("\n");
+            report.append("  ").append(getNotesPath(owner).toString().replace('\\', '/')).append("\n");
+            report.append("  ").append(getTasksPath(owner).toString().replace('\\', '/')).append("\n");
+            report.append("  ").append(getInterviewPath(owner).toString().replace('\\', '/')).append("\n");
+            report.append("  ").append(getProfilePath(owner).toString().replace('\\', '/')).append("\n");
             return report.toString();
         }
 

@@ -1,4 +1,5 @@
 *.class
 *.log
-data/chat_history.txt
+data/*/
+data/config.properties
 data/admin.properties

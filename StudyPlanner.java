@@ -37,7 +37,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class StudyPlanner extends JDialog {
-    private static final Path TASKS_PATH = Paths.get("data", "study_tasks.txt");
+    private final Path tasksPath;
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -63,6 +63,7 @@ public class StudyPlanner extends JDialog {
 
     public StudyPlanner(JFrame owner) {
         super(owner, "Study Planner", true);
+        this.tasksPath = getTasksPath(owner);
         setMinimumSize(new Dimension(960, 620));
         setSize(1000, 660);
         setLocationRelativeTo(owner);
@@ -78,6 +79,14 @@ public class StudyPlanner extends JDialog {
 
         loadData();
         refreshAll();
+    }
+
+    private static Path getTasksPath(JFrame owner) {
+        if (owner instanceof NovaAIFrame) {
+            String username = ((NovaAIFrame) owner).getCurrentUser();
+            return Paths.get("data", username, "study_tasks.txt");
+        }
+        return Paths.get("data", "study_tasks.txt");
     }
 
     public static void showPlanner(JFrame owner) {
@@ -238,11 +247,11 @@ public class StudyPlanner extends JDialog {
     private void loadData() {
         tasks.clear();
         exams.clear();
-        if (!Files.exists(TASKS_PATH)) {
+        if (!Files.exists(tasksPath)) {
             return;
         }
         try {
-            for (String line : Files.readAllLines(TASKS_PATH, StandardCharsets.UTF_8)) {
+            for (String line : Files.readAllLines(tasksPath, StandardCharsets.UTF_8)) {
                 if (line.startsWith("GOAL|")) {
                     StudyTask task = StudyTask.fromStorageLine(line);
                     if (task != null) {
@@ -262,12 +271,12 @@ public class StudyPlanner extends JDialog {
 
     private void persistData() {
         try {
-            Path parent = TASKS_PATH.getParent();
+            Path parent = tasksPath.getParent();
             if (parent != null && !Files.exists(parent)) {
                 Files.createDirectories(parent);
             }
             try (BufferedWriter writer = Files.newBufferedWriter(
-                    TASKS_PATH, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                    tasksPath, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
                 for (StudyTask task : tasks) {
                     writer.write(task.toStorageLine());
                     writer.newLine();
