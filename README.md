@@ -56,12 +56,24 @@
 
 ## Features
 
-### Core chatbot
-- ChatGPT-like layout with sidebar session list
-- New / rename / delete / favorite / search conversations
-- User & bot bubbles with timestamps
-- Rule-based **AIEngine** with synonym-aware **IntentClassifier**
-- Categories: Java, Python, C, AI, ML, Data Science, Web, Career, Interview, Resume, and more
+### Core Chatbot
+
+* ChatGPT-like layout with sidebar session list
+* New / rename / delete / favorite / search conversations
+* User & bot bubbles with timestamps
+* Rule-based **AIEngine** with **IntentClassifier**
+* **Text Normalization Engine**
+* **Intent Scoring System**
+* **NLP-Based Intent Detection**
+* Categories: Java, Python, C, AI, ML, Data Science, Web, Career, Interview, Resume, and more
+
+### Multi-User Support
+
+* Multi-User Authentication
+* User-Isolated Chat Histories
+* User-Specific Notes, Tasks, and Settings
+* Separate User Profiles and Theme Preferences
+
 
 ### Themes & settings
 - **Dark mode** plus **Theme Switcher** (Light · Dark · Midnight)
@@ -100,7 +112,7 @@
 
 ---
 
-## Project structure
+## Project Structure
 
 ```text
 Main.java
@@ -108,29 +120,49 @@ LoginFrame.java
 NovaAIFrame.java
 ChatPanel.java
 MessageBubble.java
+
 AIEngine.java
 IntentClassifier.java
+IntentScoringEngine.java
+TextNormalizer.java
+ResponseGenerator.java
+
 ConversationMemory.java
 Message.java
 ChatSession.java
 ChatHistoryData.java
+
 FileStore.java
 ThemeManager.java
 StatisticsManager.java
 UserProfile.java
+
 ResumeAssistant.java
 InterviewSimulator.java
 NotesManager.java
 StudyPlanner.java
+
 RoundedBorder.java
+RoundedPanel.java
+
 data/
-  chat_history.txt
-  notes.txt
-  study_tasks.txt
-  interview_history.txt
-  user_profile.properties
-  admin.properties
+├─ users.properties
+├─ <username>/
+│  ├─ chat_history.txt
+│  ├─ profile.properties
+│  ├─ notes.txt
+│  ├─ study_tasks.txt
+│  └─ interview_history.txt
+
+Screenshots/
+├─ login.png
+├─ dashboard.png
+├─ dark-mode.png
+├─ statistics.png
+├─ sath-dashboard.png
+└─ nitin-dashboard.png
 ```
+
 
 ---
 
@@ -244,11 +276,11 @@ Nova: Excellent choice. Python is the most popular language for AI and Machine L
 
 ## Roadmap
 
-- [ ] Fuzzy intent matching (Levenshtein)
-- [ ] Markdown rendering in chat bubbles
-- [ ] Optional OpenAI / LLM API integration
-- [ ] Packaged `.jar` / installer for Windows & macOS
-- [ ] Unit tests for `AIEngine` and file parsers
+* [ ] Advanced NLP Scoring
+* [ ] Context-Aware Responses
+* [ ] AI API Integration (Gemini/OpenRouter)
+* [ ] Packaged .jar / installer for Windows & macOS
+
 
 ---
 
