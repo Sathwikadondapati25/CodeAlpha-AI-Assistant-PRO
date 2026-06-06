@@ -318,4 +318,4 @@ This project demonstrates Java Swing development, NLP-based intent detection, mu
 
 Organization: CodeAlpha
 Task: Artificial Intelligence Chatbot
-Technology: Java Swingw
+Technology: Java Swing
