@@ -55,7 +55,13 @@
 ![Nitin Dashboard](Screenshots/nitin-dashboard.png)
 
 ---
+## Demo Video
 
+Watch the project demo:
+
+[Watch Demo Video]https://youtu.be/rzT-
+
+---
 
 ## Features
 
