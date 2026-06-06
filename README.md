@@ -81,7 +81,7 @@
 ### Themes & settings
 - **Dark mode** plus **Theme Switcher** (Light · Dark · Midnight)
 - **User Settings**: display name, email, theme preference
-- **Settings persist in data/<username>/profile.properties
+- Settings persist in data/<username>/profile.properties
 
 ### Statistics dashboard
 - **StatisticsManager** aggregates usage from all local data files
