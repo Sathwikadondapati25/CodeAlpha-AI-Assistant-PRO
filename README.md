@@ -176,7 +176,7 @@ Choose **View → Theme Switcher →** Light, Dark, or Midnight. The selection i
 
 ---
 
-## Data storage
+
 
 ## Data Storage
 
