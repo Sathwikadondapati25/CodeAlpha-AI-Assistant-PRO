@@ -59,7 +59,7 @@
 
 Watch the project demo:
 
-[Watch Demo Video]https://youtu.be/rzT-
+[Watch Demo Video](https://youtu.be/rzT-T8yRHDo)
 
 ---
 
