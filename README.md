@@ -179,7 +179,7 @@ Screenshots/
 
 ```bash
 git clone https://github.com/Sathwikadondapati25/CodeAlpha-AI-Assistant-PRO.git
-cd CodeAlpha_AI_Assistant_PRO
+cd CodeAlpha-AI-Assistant-PRO
 javac *.java
 java Main
 ```
