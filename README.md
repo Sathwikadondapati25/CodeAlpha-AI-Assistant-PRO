@@ -59,7 +59,7 @@
 
 Watch the project demo:
 
-[Watch Demo Video](https://youtu.be/rzT-T8yRHDo)
+[▶Watch Demo Video](https://youtu.be/rzT-T8yRHDo)
 
 ---
 
@@ -313,3 +313,9 @@ This project is released under the **MIT License**. See [LICENSE](LICENSE) for d
 Built as part of CodeAlpha Internship Task 3 (Artificial Intelligence Chatbot).
 
 This project demonstrates Java Swing development, NLP-based intent detection, multi-user architecture, file-based persistence, and desktop application design.
+
+## Internship Information
+
+Organization: CodeAlpha
+Task: Artificial Intelligence Chatbot
+Technology: Java Swingw
