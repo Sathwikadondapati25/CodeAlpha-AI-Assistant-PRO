@@ -178,18 +178,39 @@ Choose **View → Theme Switcher →** Light, Dark, or Midnight. The selection i
 
 ## Data storage
 
-All data is stored locally under `data/`:
+## Data Storage
 
-| File | Purpose |
-|------|---------|
-| `chat_history.txt` | Session metadata + messages |
-| `notes.txt` | Notes Manager entries |
-| `study_tasks.txt` | Daily goals & exams |
-| `interview_history.txt` | Interview simulator results |
-| `user_profile.properties` | Name, email, theme |
-| `admin.properties` | Admin login (local) |
+All data is stored locally under `data/` and is isolated per user.
 
-> **Privacy:** Data never leaves your machine unless you export it.
+| File / Folder                           | Purpose                                        |
+| --------------------------------------- | ---------------------------------------------- |
+| `users.properties`                      | Stores registered user credentials             |
+| `data/<username>/chat_history.txt`      | User chat sessions and messages                |
+| `data/<username>/profile.properties`    | User profile information and theme preferences |
+| `data/<username>/notes.txt`             | Notes Manager entries                          |
+| `data/<username>/study_tasks.txt`       | Study Planner goals and exams                  |
+| `data/<username>/interview_history.txt` | Interview Simulator results                    |
+
+### Example Structure
+
+```text
+data/
+├─ users.properties
+├─ sath/
+│  ├─ chat_history.txt
+│  ├─ profile.properties
+│  ├─ notes.txt
+│  ├─ study_tasks.txt
+│  └─ interview_history.txt
+└─ nitin/
+   ├─ chat_history.txt
+   ├─ profile.properties
+   ├─ notes.txt
+   ├─ study_tasks.txt
+   └─ interview_history.txt
+```
+
+> **Privacy:** All user data is stored locally on the machine. Data is never transmitted to external servers unless explicitly exported by the user.
 
 ---
 
