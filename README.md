@@ -9,6 +9,9 @@
 <p align="center">
   <strong>Chat · Learn · Plan · Practice · Export</strong>
 </p>
+<p align="center">
+  Multi-User Authentication · NLP Intent Detection · Dark Mode · Statistics Dashboard · Resume Builder · Interview Simulator
+</p>
 
 ---
 
@@ -78,7 +81,7 @@
 ### Themes & settings
 - **Dark mode** plus **Theme Switcher** (Light · Dark · Midnight)
 - **User Settings**: display name, email, theme preference
-- Settings persist in `data/user_profile.properties`
+- - Settings persist in data/<username>/profile.properties
 
 ### Statistics dashboard
 - **StatisticsManager** aggregates usage from all local data files
@@ -276,10 +279,10 @@ Nova: Excellent choice. Python is the most popular language for AI and Machine L
 
 ## Roadmap
 
-* [ ] Advanced NLP Scoring
-* [ ] Context-Aware Responses
-* [ ] AI API Integration (Gemini/OpenRouter)
-* [ ] Packaged .jar / installer for Windows & macOS
+- [ ] Advanced NLP Scoring
+- [ ] Context-Aware Responses
+- [ ] AI API Integration (Gemini/OpenRouter)
+- [ ] Packaged .jar / installer for Windows & macOS
 
 
 ---
