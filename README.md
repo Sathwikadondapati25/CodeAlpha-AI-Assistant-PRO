@@ -23,16 +23,36 @@
 | **Data** | Export formatted chats and notes; raw chat backup supported |
 
 ---
-
 ## Screenshots
 
-> Add screenshots to a `screenshots/` folder and link them here.
+### Login Screen
 
-| Main Chat | Dark Mode | Statistics |
-|-----------|-----------|------------|
-| *screenshots/chat.png* | *screenshots/dark.png* | *screenshots/stats.png* |
+![Login](Screenshots/login.png)
+
+### Main Dashboard
+
+![Dashboard](Screenshots/dashboard.png)
+
+### Dark Mode
+
+![Dark Mode](Screenshots/dark-mode.png)
+
+### Statistics Dashboard
+
+![Statistics](Screenshots/statistics.png)
+
+### Multi-User Support
+
+#### User: Sath
+
+![Sath Dashboard](Screenshots/sath-dashboard.png)
+
+#### User: Nitin
+
+![Nitin Dashboard](Screenshots/nitin-dashboard.png)
 
 ---
+
 
 ## Features
 
