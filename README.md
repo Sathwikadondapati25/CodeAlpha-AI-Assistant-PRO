@@ -165,8 +165,6 @@ Screenshots/
 ├─ sath-dashboard.png
 └─ nitin-dashboard.png
 ```
-
-
 ---
 
 ## Getting started
