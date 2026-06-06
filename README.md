@@ -302,9 +302,10 @@ This project is released under the **MIT License**. See [LICENSE](LICENSE) for d
 
 ---
 
-## Author & acknowledgments
 
-Built for **CodeAlpha Internship Task 3** — Artificial Intelligence Chatbot.  
-Suitable for GitHub portfolios, LinkedIn project posts, and Java Swing demonstrations.
 
-**Star this repo** if it helped your learning journey.
+## Project Purpose
+
+Built as part of CodeAlpha Internship Task 3 (Artificial Intelligence Chatbot).
+
+This project demonstrates Java Swing development, NLP-based intent detection, multi-user architecture, file-based persistence, and desktop application design.
