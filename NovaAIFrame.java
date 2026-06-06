@@ -276,7 +276,7 @@ public String getCurrentUser() {
             hideTypingIndicator();
             String response = aiEngine.respond(text.trim());
             appendMessage("Nova AI", response, false);
-            updateSessionTitleFromFirstUserMessage(activeSessionId);
+            updateSessionTitle(activeSessionId);
         });
         timer.setRepeats(false);
         timer.start();
@@ -366,26 +366,19 @@ public String getCurrentUser() {
         refreshSessionList("");
     }
 
-    private void updateSessionTitleFromFirstUserMessage(String sessionId) {
-        List<Message> messages = sessionMessages.get(sessionId);
-        if (messages == null) {
+    private void updateSessionTitle(String sessionId) {
+        ChatSession session = chatSessions.get(sessionId);
+        if (session == null || session.isCustomTitle()) {
             return;
         }
-        for (Message message : messages) {
-            if (message.isUserMessage()) {
-                String title = message.getContent();
-                if (title.length() > 34) {
-                    title = title.substring(0, 34) + "...";
-                }
-                ChatSession session = chatSessions.get(sessionId);
-                if (session != null) {
-                    session.setTitle(title);
-                }
-                refreshSessionList(modernSidebar.getSearchQuery());
-                persistAllSessions();
-                return;
-            }
+        List<Message> messages = sessionMessages.get(sessionId);
+        if (messages == null || messages.isEmpty()) {
+            return;
         }
+        String smartTitle = FileStore.inferSmartTitle(messages);
+        session.setTitleQuietly(smartTitle);
+        refreshSessionList(modernSidebar.getSearchQuery());
+        persistAllSessions();
     }
 
     private void refreshSessionList(String query) {
@@ -458,6 +451,7 @@ public String getCurrentUser() {
             return;
         }
         session.setTitle(trimmed);
+        session.setCustomTitle(true);
         refreshSessionList(modernSidebar.getSearchQuery());
         persistAllSessions();
     }

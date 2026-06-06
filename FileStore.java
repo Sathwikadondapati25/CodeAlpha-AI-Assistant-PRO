@@ -149,15 +149,162 @@ public class FileStore {
     }
 
     private static String inferTitleFromMessages(List<Message> messages) {
+        return inferSmartTitle(messages);
+    }
+
+    public static String inferSmartTitle(List<Message> messages) {
+        if (messages == null || messages.isEmpty()) {
+            return "New Conversation";
+        }
+
+        java.util.Set<String> topics = new java.util.HashSet<>();
+        IntentClassifier tempClassifier = new IntentClassifier();
+        ConversationMemory tempMemory = new ConversationMemory();
+
+        for (Message msg : messages) {
+            if (msg.isUserMessage()) {
+                IntentClassifier.Intent intent = tempClassifier.classify(msg.getContent(), tempMemory);
+                if (intent != null) {
+                    switch (intent) {
+                        case HTML: topics.add("HTML"); break;
+                        case CSS: topics.add("CSS"); break;
+                        case JAVASCRIPT: topics.add("JS"); break;
+                        case REACT: topics.add("React"); break;
+                        case AI: topics.add("AI"); break;
+                        case ML: topics.add("ML"); break;
+                        case DATA_SCIENCE: topics.add("DS"); break;
+                        case SQL: topics.add("SQL"); break;
+                        case DBMS: topics.add("DBMS"); break;
+                        case DSA: topics.add("DSA"); break;
+                        case OOP: topics.add("OOP"); break;
+                        case OS: topics.add("OS"); break;
+                        case COMPUTER_NETWORKS: topics.add("CN"); break;
+                        case JAVA: topics.add("Java"); break;
+                        case PYTHON: topics.add("Python"); break;
+                        case C_PROGRAMMING: topics.add("C"); break;
+                        case CAREER: topics.add("Career"); break;
+                        case RESUME: topics.add("Resume"); break;
+                        case INTERVIEW: topics.add("Interview"); break;
+                        case INTERNSHIP: topics.add("Internship"); break;
+                        case PROJECTS: topics.add("Projects"); break;
+                        case WEB_DEVELOPMENT: topics.add("WebDev"); break;
+                        default: break;
+                    }
+                }
+            }
+        }
+
+        // Web Dev combinations
+        boolean hasHtml = topics.contains("HTML");
+        boolean hasCss = topics.contains("CSS");
+        boolean hasJs = topics.contains("JS");
+        boolean hasReact = topics.contains("React");
+        boolean hasWebDev = topics.contains("WebDev");
+        int webCount = (hasHtml ? 1 : 0) + (hasCss ? 1 : 0) + (hasJs ? 1 : 0) + (hasReact ? 1 : 0) + (hasWebDev ? 1 : 0);
+
+        if (webCount >= 3) {
+            return "Web Development";
+        }
+        if (hasHtml && hasCss) {
+            return "HTML & CSS";
+        }
+        if (hasHtml && hasJs) {
+            return "HTML & JavaScript";
+        }
+        if (hasCss && hasJs) {
+            return "CSS & JavaScript";
+        }
+
+        // AI/ML/Data Science combinations
+        boolean hasAi = topics.contains("AI");
+        boolean hasMl = topics.contains("ML");
+        boolean hasDs = topics.contains("DS");
+        if ((hasAi && hasMl) || (hasMl && hasDs) || (hasAi && hasDs)) {
+            return "AI & Data Science";
+        }
+
+        // Database combinations
+        boolean hasSql = topics.contains("SQL");
+        boolean hasDbms = topics.contains("DBMS");
+        if (hasSql && hasDbms) {
+            return "SQL & Databases";
+        }
+
+        // DSA/OOP combinations
+        boolean hasDsa = topics.contains("DSA");
+        boolean hasOop = topics.contains("OOP");
+        if (hasDsa && hasOop) {
+            return "DSA & OOP";
+        }
+
+        // OS/CN combinations
+        boolean hasOs = topics.contains("OS");
+        boolean hasCn = topics.contains("CN");
+        if (hasOs && hasCn) {
+            return "OS & Networks";
+        }
+
+        // Programming Languages combinations
+        boolean hasJava = topics.contains("Java");
+        boolean hasPython = topics.contains("Python");
+        boolean hasC = topics.contains("C");
+        int langCount = (hasJava ? 1 : 0) + (hasPython ? 1 : 0) + (hasC ? 1 : 0);
+        if (langCount >= 2) {
+            return "Programming Languages";
+        }
+
+        // Career combinations
+        boolean hasCareer = topics.contains("Career");
+        boolean hasResume = topics.contains("Resume");
+        boolean hasInterview = topics.contains("Interview");
+        boolean hasInternship = topics.contains("Internship");
+        boolean hasProj = topics.contains("Projects");
+        int careerCount = (hasCareer ? 1 : 0) + (hasResume ? 1 : 0) + (hasInterview ? 1 : 0) + (hasInternship ? 1 : 0) + (hasProj ? 1 : 0);
+        if (careerCount >= 2) {
+            return "Career Preparation";
+        }
+
+        // If only one specific topic was found, return its user-friendly name:
+        if (topics.size() == 1) {
+            String single = topics.iterator().next();
+            switch (single) {
+                case "HTML": return "HTML";
+                case "CSS": return "CSS";
+                case "JS": return "JavaScript";
+                case "React": return "React";
+                case "WebDev": return "Web Development";
+                case "AI": return "Artificial Intelligence";
+                case "ML": return "Machine Learning";
+                case "DS": return "Data Science";
+                case "SQL": return "SQL Queries";
+                case "DBMS": return "Database Systems";
+                case "DSA": return "Data Structures";
+                case "OOP": return "OOP Concepts";
+                case "OS": return "Operating Systems";
+                case "CN": return "Computer Networks";
+                case "Java": return "Java Programming";
+                case "Python": return "Python Programming";
+                case "C": return "C Programming";
+                case "Career": return "Career Advice";
+                case "Resume": return "Resume Building";
+                case "Interview": return "Interview Prep";
+                case "Internship": return "Internship Advice";
+                case "Projects": return "Project Ideas";
+            }
+        }
+
+        // Fallback: use first user message's content
         for (Message message : messages) {
             if (message.isUserMessage()) {
                 String text = message.getContent();
                 return text.length() > 34 ? text.substring(0, 34) + "..." : text;
             }
         }
+
         if (!messages.isEmpty()) {
             return "Chat " + messages.get(0).getTimestamp().format(java.time.format.DateTimeFormatter.ofPattern("MMM dd"));
         }
+
         return "New Conversation";
     }
 

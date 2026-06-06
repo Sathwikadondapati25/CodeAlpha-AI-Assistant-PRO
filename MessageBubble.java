@@ -27,12 +27,56 @@ public class MessageBubble extends JPanel {
     }
 
     public MessageBubble(String content, boolean userMessage, LocalDateTime timestamp) {
-        this.content = content == null ? "" : content;
+        this.content = userMessage ? (content == null ? "" : content) : cleanMarkdown(content);
         this.userMessage = userMessage;
         this.timeLabel = timestamp == null ? "" : timestamp.format(TIME_FMT);
         setOpaque(false);
         setBorder(new EmptyBorder(6, 10, 6, 10));
         measure();
+    }
+
+    private static String cleanMarkdown(String raw) {
+        if (raw == null) return "";
+        String[] lines = raw.split("\n", -1);
+        StringBuilder sb = new StringBuilder();
+        boolean inCodeBlock = false;
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            String trimmed = line.trim();
+
+            if (trimmed.startsWith("```")) {
+                inCodeBlock = !inCodeBlock;
+                continue;
+            }
+
+            if (!inCodeBlock) {
+                if (trimmed.startsWith("#")) {
+                    int hashCount = 0;
+                    while (hashCount < trimmed.length() && trimmed.charAt(hashCount) == '#') {
+                        hashCount++;
+                    }
+                    line = trimmed.substring(hashCount).trim();
+                    if (!line.isEmpty() && !line.endsWith(":") && !line.endsWith("?") && !line.endsWith("!")) {
+                        line = line + ":";
+                    }
+                }
+
+                if (trimmed.startsWith("* ") || trimmed.startsWith("- ") || trimmed.startsWith("• ")) {
+                    int bulletIndex = line.indexOf(trimmed.charAt(0));
+                    line = line.substring(0, bulletIndex) + "• " + trimmed.substring(2);
+                }
+
+                line = line.replace("**", "");
+                line = line.replace("*", "");
+                line = line.replace("`", "");
+            }
+
+            sb.append(line);
+            if (i < lines.length - 1) {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
     }
 
     public void setMaxWidth(int max) {
@@ -43,22 +87,31 @@ public class MessageBubble extends JPanel {
     private void measure() {
         Font font = UiPalette.FONT_BODY;
         FontMetrics fm = getFontMetrics(font);
-        String[] words = content.split("\\s+");
-        StringBuilder line = new StringBuilder();
-        int lines = 1;
+        int lines = 0;
         contentWidth = 0;
 
-        for (String word : words) {
-            String trial = line.length() == 0 ? word : line + " " + word;
-            if (fm.stringWidth(trial) > maxTextWidth) {
-                contentWidth = Math.max(contentWidth, fm.stringWidth(line.toString()));
-                line = new StringBuilder(word);
+        String[] rawLines = content.split("\n", -1);
+        for (String rawLine : rawLines) {
+            if (rawLine.isEmpty()) {
                 lines++;
-            } else {
-                line = new StringBuilder(trial);
+                continue;
             }
+            String[] words = rawLine.split(" ");
+            StringBuilder line = new StringBuilder();
+            for (String word : words) {
+                String trial = line.length() == 0 ? word : line + " " + word;
+                if (fm.stringWidth(trial) > maxTextWidth) {
+                    contentWidth = Math.max(contentWidth, fm.stringWidth(line.toString()));
+                    line = new StringBuilder(word);
+                    lines++;
+                } else {
+                    line = new StringBuilder(trial);
+                }
+            }
+            contentWidth = Math.max(contentWidth, fm.stringWidth(line.toString()));
+            lines++;
         }
-        contentWidth = Math.max(contentWidth, fm.stringWidth(line.toString()));
+
         contentWidth = Math.min(maxTextWidth, contentWidth + 24);
         contentHeight = lines * fm.getHeight() + 18;
         setPreferredSize(new Dimension(contentWidth + 24, contentHeight + 20));
@@ -92,22 +145,30 @@ public class MessageBubble extends JPanel {
 
     private void drawWrappedText(Graphics2D g2, String text, int x, int y, int maxWidth) {
         FontMetrics fm = g2.getFontMetrics();
-        String[] words = text.split("\\s+");
-        StringBuilder line = new StringBuilder();
         int lineY = y + fm.getAscent();
 
-        for (String word : words) {
-            String trial = line.length() == 0 ? word : line + " " + word;
-            if (fm.stringWidth(trial) > maxWidth) {
-                g2.drawString(line.toString(), x, lineY);
-                line = new StringBuilder(word);
+        String[] rawLines = text.split("\n", -1);
+        for (String rawLine : rawLines) {
+            if (rawLine.isEmpty()) {
                 lineY += fm.getHeight();
-            } else {
-                line = new StringBuilder(trial);
+                continue;
             }
-        }
-        if (line.length() > 0) {
-            g2.drawString(line.toString(), x, lineY);
+            String[] words = rawLine.split(" ");
+            StringBuilder line = new StringBuilder();
+            for (String word : words) {
+                String trial = line.length() == 0 ? word : line + " " + word;
+                if (fm.stringWidth(trial) > maxWidth) {
+                    g2.drawString(line.toString(), x, lineY);
+                    line = new StringBuilder(word);
+                    lineY += fm.getHeight();
+                } else {
+                    line = new StringBuilder(trial);
+                }
+            }
+            if (line.length() > 0) {
+                g2.drawString(line.toString(), x, lineY);
+                lineY += fm.getHeight();
+            }
         }
     }
 }

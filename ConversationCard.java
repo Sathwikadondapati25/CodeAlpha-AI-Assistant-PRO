@@ -39,6 +39,7 @@ public class ConversationCard extends JPanel {
     private final JLabel previewLabel;
     private final JLabel timestampLabel;
     private final JLabel iconLabel;
+    private final JLabel pinIndicator;
     private final ThreeDotButton menuButton;
     private boolean active;
     private boolean hovered;
@@ -118,6 +119,10 @@ public class ConversationCard extends JPanel {
         timestampLabel.setForeground(UiPalette.TEXT_SECONDARY);
         timestampLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
+        pinIndicator = new JLabel(new PinIcon());
+        pinIndicator.setVisible(pinned);
+        pinIndicator.setAlignmentY(Component.CENTER_ALIGNMENT);
+
         menuButton = new ThreeDotButton();
         menuButton.setPreferredSize(new Dimension(34, 34));
         menuButton.setMaximumSize(new Dimension(34, 34));
@@ -129,11 +134,14 @@ public class ConversationCard extends JPanel {
             }
         });
         menuButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        menuButton.setAlignmentY(Component.CENTER_ALIGNMENT);
 
         JPanel topRightRow = new JPanel();
         topRightRow.setOpaque(false);
         topRightRow.setLayout(new BoxLayout(topRightRow, BoxLayout.X_AXIS));
         topRightRow.add(Box.createHorizontalGlue());
+        topRightRow.add(pinIndicator);
+        topRightRow.add(Box.createHorizontalStrut(6));
         topRightRow.add(menuButton);
 
         JPanel rightPanel = new JPanel();
@@ -199,6 +207,14 @@ public class ConversationCard extends JPanel {
             raw = raw.substring(2);
         }
         titleLabel.setText(formatTitle(raw));
+        repaint();
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
+        if (pinIndicator != null) {
+            pinIndicator.setVisible(pinned);
+        }
         repaint();
     }
 

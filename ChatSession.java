@@ -10,6 +10,7 @@ public class ChatSession {
     private boolean pinned;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean customTitle = false;
 
     public ChatSession(String id, String title, boolean favorite, boolean pinned, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -44,6 +45,14 @@ public class ChatSession {
 
     public void setTitleQuietly(String title) {
         this.title = title == null || title.trim().isEmpty() ? "New Conversation" : title.trim();
+    }
+
+    public boolean isCustomTitle() {
+        return customTitle;
+    }
+
+    public void setCustomTitle(boolean customTitle) {
+        this.customTitle = customTitle;
     }
 
     public boolean isFavorite() {
@@ -93,21 +102,25 @@ public class ChatSession {
                 + "|" + favorite
                 + "|" + createdAt.format(TIME_FORMAT)
                 + "|" + updatedAt.format(TIME_FORMAT)
-                + "|" + pinned;
+                + "|" + pinned
+                + "|" + customTitle;
     }
 
     public static ChatSession fromStorageLine(String line) {
         if (line == null || !line.startsWith("SESSION|")) {
             return null;
         }
-        String[] parts = line.split("\\|", 7);
+        String[] parts = line.split("\\|", 8);
         if (parts.length < 6) {
             return null;
         }
         LocalDateTime created = LocalDateTime.parse(parts[4], TIME_FORMAT);
         LocalDateTime updated = LocalDateTime.parse(parts[5], TIME_FORMAT);
         boolean fav = Boolean.parseBoolean(parts[3]);
-        boolean pin = parts.length == 7 ? Boolean.parseBoolean(parts[6]) : false;
-        return new ChatSession(parts[1], parts[2], fav, pin, created, updated);
+        boolean pin = parts.length >= 7 ? Boolean.parseBoolean(parts[6]) : false;
+        boolean custom = parts.length >= 8 ? Boolean.parseBoolean(parts[7]) : false;
+        ChatSession session = new ChatSession(parts[1], parts[2], fav, pin, created, updated);
+        session.setCustomTitle(custom);
+        return session;
     }
 }
